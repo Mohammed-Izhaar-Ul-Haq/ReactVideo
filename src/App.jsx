@@ -8,7 +8,6 @@ function App() {
   const [recordedChunks, setRecordedChunks] = useState([]);
   const [timer, setTimer] = useState(0);
   const [intervalId, setIntervalId] = useState(null);
-  const [pausedTime, setPausedTime] = useState(0);
   const [selectedMimeType, setSelectedMimeType] = useState("video/webm; codecs=vp8");
 
   // Video constraints for responsiveness
@@ -27,43 +26,36 @@ function App() {
     []
   );
 
-  // Function to start the timer
-  const startTimer = () => {
+  const startTimer = useCallback(() => {
     setTimer(0);
     const id = setInterval(() => {
       setTimer(prevTime => prevTime + 1);
     }, 1000);
     setIntervalId(id);
-  };
+  }, []);
 
-  // Function to stop the timer
-  const stopTimer = () => {
+  const stopTimer = useCallback(() => {
     if (intervalId) {
       clearInterval(intervalId);
-      setPausedTime(timer);
       setIntervalId(null);
     }
-  };
+  }, [intervalId]);
 
   const handleStartCaptureClick = useCallback(() => {
-    if (intervalId) {
-      stopTimer();
-    }
     setCapturing(true);
-    setTimer(0);
     startTimer();
     mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
       mimeType: selectedMimeType
     });
     mediaRecorderRef.current.addEventListener("dataavailable", handleDataAvailable);
     mediaRecorderRef.current.start();
-  }, [intervalId, selectedMimeType]);
+  }, [selectedMimeType, handleDataAvailable, startTimer]);
 
   const handleStopCaptureClick = useCallback(() => {
     mediaRecorderRef.current.stop();
     setCapturing(false);
     stopTimer();
-  }, []);
+  }, [stopTimer]);
 
   const handleDownload = useCallback(() => {
     if (recordedChunks.length > 0) {
@@ -161,7 +153,7 @@ function App() {
         <button onClick={handleDownload} style={buttonStyle}>Download</button>
       )}
       {/* Display the timer */}
-      <div style={timerStyle}>Time: {capturing ? timer : pausedTime} seconds</div>
+      <div style={timerStyle}>Time: {timer} seconds</div>
     </div>
   );
 }
