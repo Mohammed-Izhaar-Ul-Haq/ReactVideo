@@ -107,10 +107,6 @@ function App() {
           <option value="video/mp4; codecs=avc1">video/mp4; codecs=avc1</option>
           <option value="video/mp4; codecs=mp4v.20.8">video/mp4; codecs=mp4v.20.8</option>
           <option value="video/mp4; codecs=hev1">video/mp4; codecs=hev1</option>
-          <option value="video/ogg; codecs=theora">video/ogg; codecs=theora</option>
-          <option value="audio/webm; codecs=opus">audio/webm; codecs=opus</option>
-          <option value="audio/webm; codecs=vorbis">audio/webm; codecs=vorbis</option>
-          <option value="audio/ogg; codecs=vorbis">audio/ogg; codecs=vorbis</option>
         </select>
       </div>
       {capturing ? (
