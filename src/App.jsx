@@ -21,17 +21,17 @@ function App() {
   const handleDataAvailable = useCallback(
     ({ data }) => {
       if (data.size > 0) {
-        setRecordedChunks((prev) => prev.concat(data));
+        setRecordedChunks(prev => [...prev, data]);
       }
     },
-    [setRecordedChunks]
+    []
   );
 
   // Function to start the timer
   const startTimer = () => {
     setTimer(0);
     const id = setInterval(() => {
-      setTimer((prevTime) => prevTime + 1);
+      setTimer(prevTime => prevTime + 1);
     }, 1000);
     setIntervalId(id);
   };
@@ -57,26 +57,28 @@ function App() {
     });
     mediaRecorderRef.current.addEventListener("dataavailable", handleDataAvailable);
     mediaRecorderRef.current.start();
-  }, [webcamRef, setCapturing, mediaRecorderRef, handleDataAvailable, intervalId, selectedMimeType]);
+  }, [intervalId, selectedMimeType]);
 
   const handleStopCaptureClick = useCallback(() => {
     mediaRecorderRef.current.stop();
     setCapturing(false);
     stopTimer();
-  }, [mediaRecorderRef, setCapturing]);
+  }, []);
 
   const handleDownload = useCallback(() => {
     if (recordedChunks.length > 0) {
       const blob = new Blob(recordedChunks, { type: selectedMimeType });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.style = "display: none";
+      a.style.display = 'none';
       a.href = url;
       a.download = "react-webcam-stream-capture.webm";
+      document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       setRecordedChunks([]);
+      // Refresh the page after download
+      window.location.reload();
     }
   }, [recordedChunks, selectedMimeType]);
 
@@ -84,7 +86,7 @@ function App() {
     return () => {
       stopTimer();
     };
-  }, []);
+  }, [stopTimer]);
 
   // Responsive styles
   const appStyle = {
@@ -148,8 +150,6 @@ function App() {
           <option value="video/webm; codecs=vp9">video/webm; codecs=vp9</option>
           <option value="video/webm; codecs=avc1">video/webm; codecs=avc1</option>
           <option value="video/mp4; codecs=avc1">video/mp4; codecs=avc1</option>
-          <option value="video/mp4; codecs=mp4v.20.8">video/mp4; codecs=mp4v.20.8</option>
-          <option value="video/mp4; codecs=hev1">video/mp4; codecs=hev1</option>
         </select>
       </div>
       {capturing ? (
